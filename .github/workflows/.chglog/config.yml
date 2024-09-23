@@ -1,0 +1,140 @@
+repository_url: "https://github.com/sudocovik/minecraft-server-charts"
+
+# Tag filters (optional)
+tag_filter: '^v?(\d+\.\d+\.\d+)$'# .chglog/config.yml
+
+repository_url: "https://github.com/sudocovik/minecraft-server-charts"
+
+# Tag filters (optional)
+tag_filter: '^v?(\d+\.\d+\.\d+)$'
+
+# Commit message filters (use Conventional Commits standard)
+commit_filters:
+  Type: true
+  Scope: false
+  Subject: true
+  Body: false
+  Footers: false
+  Notes: false
+
+# Commit sort
+commit_sort_by: "CommitterTime"
+commit_sort: "DESC"
+
+# Commit group by
+commit_group_by: "Type"
+
+# Commit groups
+commit_groups:
+  - title: "✨ Features"
+    regexp: "^feat"
+  - title: "🐛 Bug Fixes"
+    regexp: "^fix"
+  - title: "📝 Documentation"
+    regexp: "^docs"
+  - title: "♻️ Refactoring"
+    regexp: "^refactor"
+  - title: "🚀 Performance Improvements"
+    regexp: "^perf"
+  - title: "✅ Tests"
+    regexp: "^test"
+  - title: "👷 Build System"
+    regexp: "^build"
+  - title: "⚙️ CI/CD"
+    regexp: "^ci"
+  - title: "🧹 Chores"
+    regexp: "^chore"
+
+# Note groups (for BREAKING CHANGES)
+note_groups:
+  - title: "⚠️ BREAKING CHANGES"
+
+# Template (you can customize this as needed)
+template: |
+  {{ range .Versions }}
+  ## {{ if .Tag.Previous }}[{{ .Tag.Name }}]({{ $.Info.RepositoryURL }}/compare/{{ .Tag.Previous.Name }}...{{ .Tag.Name }}){{ else }}{{ .Tag.Name }}{{ end }} - {{ datetime "2006-01-02" .Tag.Date }}
+
+  {{ range .CommitGroups -}}
+  ### {{ .Title }}
+
+  {{ range .Commits -}}
+  - {{ if .Scope }}**{{ .Scope }}:** {{ end }}{{ .Subject }} ([{{ .Hash.Short }}]({{ $.Info.RepositoryURL }}/commit/{{ .Hash.Long }}))
+  {{ end }}
+  {{ end -}}
+
+  {{ if .NoteGroups -}}
+  {{ range .NoteGroups -}}
+  ### {{ .Title }}
+
+  {{ range .Notes }}
+  - {{ .Body }}
+  {{ end }}
+  {{ end -}}
+  {{ end -}}
+  {{ end -}}
+
+
+# Commit message filters (use Conventional Commits standard)
+commit_filters:
+  Type: true
+  Scope: false
+  Subject: true
+  Body: false
+  Footers: false
+  Notes: false
+
+# Commit sort
+commit_sort_by: "CommitterTime"
+commit_sort: "DESC"
+
+# Commit group by
+commit_group_by: "Type"
+
+# Commit groups
+commit_groups:
+  - title: "✨ Features"
+    regexp: "^feat"
+  - title: "🐛 Bug Fixes"
+    regexp: "^fix"
+  - title: "📝 Documentation"
+    regexp: "^docs"
+  - title: "♻️ Refactoring"
+    regexp: "^refactor"
+  - title: "🚀 Performance Improvements"
+    regexp: "^perf"
+  - title: "✅ Tests"
+    regexp: "^test"
+  - title: "👷 Build System"
+    regexp: "^build"
+  - title: "⚙️ CI/CD"
+    regexp: "^ci"
+  - title: "🧹 Chores"
+    regexp: "^chore"
+
+# Note groups (for BREAKING CHANGES)
+note_groups:
+  - title: "⚠️ BREAKING CHANGES"
+
+# Template (you can customize this as needed)
+template: |
+  {{ range .Versions }}
+  ## {{ if .Tag.Previous }}[{{ .Tag.Name }}]({{ $.Info.RepositoryURL }}/compare/{{ .Tag.Previous.Name }}...{{ .Tag.Name }}){{ else }}{{ .Tag.Name }}{{ end }} - {{ datetime "2006-01-02" .Tag.Date }}
+
+  {{ range .CommitGroups -}}
+  ### {{ .Title }}
+
+  {{ range .Commits -}}
+  - {{ if .Scope }}**{{ .Scope }}:** {{ end }}{{ .Subject }} ([{{ .Hash.Short }}]({{ $.Info.RepositoryURL }}/commit/{{ .Hash.Long }}))
+  {{ end }}
+  {{ end -}}
+
+  {{ if .NoteGroups -}}
+  {{ range .NoteGroups -}}
+  ### {{ .Title }}
+
+  {{ range .Notes }}
+  - {{ .Body }}
+  {{ end }}
+  {{ end -}}
+  {{ end -}}
+  {{ end -}}

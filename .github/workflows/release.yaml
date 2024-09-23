@@ -43,7 +43,7 @@ jobs:
               range="${last_tag}..HEAD"
             fi
             # Generate the changelog
-            git-chglog --output $chart_dir/CHANGELOG.md $range -- $chart_dir
+            git-chglog --config .chglog/config.yml --output $chart_dir/CHANGELOG.md $range -- $chart_dir
           done
 
       - name: Run chart-releaser
