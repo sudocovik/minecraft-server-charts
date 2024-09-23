@@ -25,18 +25,25 @@ jobs:
           # Install Helm
           curl -fsSL https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
           # Install git-chglog
-          sudo apt-get update && sudo apt-get install -y git-chglog
+          GIT_CHGLOG_VERSION=0.15.1  # Replace with the latest version
+          curl -sSL https://github.com/git-chglog/git-chglog/releases/download/v${GIT_CHGLOG_VERSION}/git-chglog_${GIT_CHGLOG_VERSION}_linux_amd64.tar.gz | tar -xz -C /usr/local/bin git-chglog
 
       - name: Generate per-chart CHANGELOG.md files
         run: |
-          CHARTS_CHANGED=$(git diff --dirstat=files,0 HEAD~1 HEAD | cut -f2 | grep -E '^charts/' | cut -d'/' -f2 | sort | uniq)
-          for chart in $CHARTS_CHANGED; do
-            echo "Generating changelog for chart: $chart"
-            # Navigate to the chart directory
-            cd charts/$chart
-            # Generate the changelog for the chart
-            git-chglog --path . > CHANGELOG.md
-            cd ../../
+          for chart_dir in charts/*/; do
+            chart=$(basename $chart_dir)
+            echo "Processing chart: $chart"
+            # Get the latest tag for this chart
+            last_tag=$(git tag --list "${chart}-*" --sort=-v:refname | head -n 1)
+            if [ -z "$last_tag" ]; then
+              echo "No previous tag found for $chart. Generating changelog from beginning."
+              range=""
+            else
+              echo "Found last tag for $chart: $last_tag"
+              range="${last_tag}..HEAD"
+            fi
+            # Generate the changelog
+            git-chglog --output $chart_dir/CHANGELOG.md $range -- $chart_dir
           done
 
       - name: Run chart-releaser
