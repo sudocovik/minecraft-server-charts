@@ -43,16 +43,26 @@ jobs:
             # Get the latest tag for this chart
             last_tag=$(git tag --list "${chart}-*" --sort=-v:refname | head -n 1)
 
+            # Remove trailing slash from chart_dir
+            chart_dir="${chart_dir%/}"
+
             if [ -z "$last_tag" ]; then
               echo "No previous tag found for $chart. Generating changelog from the beginning."
+              # Check if commits exist for the chart directory
+              commit_count=$(git log --oneline -- "${chart_dir}" | wc -l)
+              if [ "$commit_count" -eq 0 ]; then
+                echo "No commits found for ${chart_dir}. Skipping changelog generation."
+                continue
+              fi
               # Generate changelog from the beginning
-              git-chglog --config .chglog/config.yml --next-tag "$next_tag" --output "${chart_dir}CHANGELOG.md" -- "$chart_dir"
+              git-chglog --config .chglog/config.yml --next-tag "$next_tag" --output "${chart_dir}/CHANGELOG.md" --include-merges -- "${chart_dir}"
             else
               echo "Found last tag for $chart: $last_tag"
               # Generate changelog since the last tag
-              git-chglog --config .chglog/config.yml --next-tag "$next_tag" --output "${chart_dir}CHANGELOG.md" "${last_tag}..HEAD" -- "$chart_dir"
+              git-chglog --config .chglog/config.yml --next-tag "$next_tag" --output "${chart_dir}/CHANGELOG.md" "${last_tag}..HEAD" --include-merges -- "${chart_dir}"
             fi
           done
+
 
       # Optionally, create and push tags before releasing
       # - name: Create and Push Git Tags
