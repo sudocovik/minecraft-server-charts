@@ -7,7 +7,7 @@ on:
 
 jobs:
   release:
-    timeout-minutes: 10
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -24,26 +24,29 @@ jobs:
         run: |
           # Install Helm
           curl -fsSL https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+          
           # Install git-chglog
-          GIT_CHGLOG_VERSION=0.15.1  # Replace with the latest version
+          GIT_CHGLOG_VERSION=0.15.1  # Update to the latest version if available
           curl -sSL https://github.com/git-chglog/git-chglog/releases/download/v${GIT_CHGLOG_VERSION}/git-chglog_${GIT_CHGLOG_VERSION}_linux_amd64.tar.gz | tar -xz -C /usr/local/bin git-chglog
 
       - name: Generate per-chart CHANGELOG.md files
         run: |
           for chart_dir in charts/*/; do
-            chart=$(basename $chart_dir)
+            chart=$(basename "$chart_dir")
             echo "Processing chart: $chart"
+            
             # Get the latest tag for this chart
             last_tag=$(git tag --list "${chart}-*" --sort=-v:refname | head -n 1)
+            
             if [ -z "$last_tag" ]; then
-              echo "No previous tag found for $chart. Generating changelog from beginning."
-              range=""
+              echo "No previous tag found for $chart. Generating changelog from the beginning."
+              # Generate changelog from the start
+              git-chglog --config .chglog/config.yml --output "${chart_dir}CHANGELOG.md" -- "$chart_dir"
             else
               echo "Found last tag for $chart: $last_tag"
-              range="${last_tag}..HEAD"
+              # Generate changelog since the last tag
+              git-chglog --config .chglog/config.yml --output "${chart_dir}CHANGELOG.md" "${last_tag}..HEAD" -- "$chart_dir"
             fi
-            # Generate the changelog
-            git-chglog --config .chglog/config.yml --output $chart_dir/CHANGELOG.md $range -- $chart_dir
           done
 
       - name: Run chart-releaser
